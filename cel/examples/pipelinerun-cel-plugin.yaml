@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: example-pr-with-plugins-
+spec:
+  serviceAccountName: "default"
+  pipelineSpec:
+    params:
+      - name: greeting
+        type: string
+    tasks:
+      - name: greeting-string
+        taskRef:
+          apiVersion: cel.tekton.dev/v1alpha1
+          kind: CEL
+        params:
+          - name: greeting
+            value: "$(params.greeting)"
+      - name: echo-greeting-string
+        params:
+          - name: greeting
+            value: $(tasks.greeting-string.results.greeting)
+        taskSpec:
+          steps:
+            - name: echo
+              image: ubuntu
+              script: echo "$(params.greeting)"!
+          params:
+            - name: greeting
+  params:
+    - name: greeting
+      value: "custom.AddSuffix(custom.AddPrefix('Hello world!', 'CEL'), ' Done.')"

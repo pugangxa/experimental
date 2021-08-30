@@ -19,6 +19,7 @@ package cel
 import (
 	"context"
 	"fmt"
+
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/tektoncd/pipeline/pkg/client/injection/reconciler/pipeline/v1alpha1/run"
@@ -91,6 +92,11 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, run *v1alpha1.Run) recon
 	if err != nil {
 		logger.Errorf("Couldn't create a program env with standard library of CEL functions & macros when reconciling Run %s/%s: %v", run.Namespace, run.Name, err)
 		return err
+	}
+	// Load the plugins if have
+	env, err = loadPlugins(env)
+	if err != nil {
+		logger.Fatal("Error when loading plugins.")
 	}
 
 	var runResults []v1alpha1.RunResult

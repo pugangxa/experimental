@@ -50,6 +50,8 @@ spec:
           volumeMounts:
             - name: config-logging
               mountPath: /etc/config-logging
+            - name: plugin-path
+              mountPath: /var/plugins
           env:
             - name: SYSTEM_NAMESPACE
               valueFrom:
@@ -64,3 +66,6 @@ spec:
         - name: config-logging
           configMap:
             name: config-logging
+        - name: plugin-path
+          persistentVolumeClaim:
+            claimName: cel-pvc
